@@ -10,9 +10,10 @@ app = Flask(__name__, template_folder='./templates')
 
 camera = cv2.VideoCapture(0)
 
-global cameraOn
+global cameraOn, detect
 
 cameraOn = 1
+detect = 0
 
 @app.route("/")
 def index():
@@ -21,7 +22,7 @@ def index():
 @app.route('/requests', methods=['POST','GET'])
 def cam():
     if request.method == 'POST':
-        if request.form.get('start') == 'Start':
+        if request.form.get('toggle') == 'Toggle Camera':
             if(cameraOn == 1):
                 cameraOn = 0
                 camera.release()
@@ -29,6 +30,12 @@ def cam():
             else:
                 camera = cv2.VideoCapture(0)
                 cameraOn = 1
+        if request.form.get('detect') == 'Detect':
+            global detect
+            detect = not detect
+    elif request.method=='GET':
+        return render_template('index.html')
+    return render_template('index.html')
 
 @app.route('/video_feed')
 def video_feed():
@@ -38,9 +45,9 @@ def gen_frames():
     
     while True:
         ret, frame = camera.read()
-
-        try:
+        if (detect):
             detectEmotion(frame)
+        try:
             ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
