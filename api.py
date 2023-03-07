@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+from PIL import Image
+import base64
 import cv2
 from deepface import DeepFace as df
 import datetime, time
@@ -10,9 +12,13 @@ app = Flask(__name__)
 
 @app.route('/api', methods = ['GET'])
 def detect_emotion():
-    base64Image = {}
-    
-    return
+    image = request.files['images']
+    detectedImage = {}
+    img = Image.open(image.stream)
+    detected = detectEmotion(img)
+    encodedImage = base64.b64encode(detected.read())
+    detectedImage['output'] = encodedImage
+    return jsonify({detectedImage})
 
 if __name__ =='__main__':
     app.run()

@@ -1,20 +1,18 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:ui';
+import 'dart:convert';
+import 'package:emotion_recognition_webapp/detect_emotion.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
+import 'package:camera_web/camera_web.dart';
 import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   final cameras = await availableCameras();
-
-  final firstCamera = cameras.first;
-
+  final firstCamera = cameras[0];
   runApp(MyApp(
     camera: firstCamera,
   ));
@@ -50,10 +48,8 @@ class CameraScreenState extends State<CameraScreen> {
       // Get a specific camera from the list of available cameras.
       widget.camera,
       // Define the resolution to use.
-      ResolutionPreset.medium,
+      ResolutionPreset.max,
     );
-
-    // Next, initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
   }
 
@@ -63,6 +59,8 @@ class CameraScreenState extends State<CameraScreen> {
     _controller.dispose();
     super.dispose();
   }
+
+//
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +80,6 @@ class CameraScreenState extends State<CameraScreen> {
       floatingActionButton: FloatingActionButton(
         // Provide an onPressed callback.
         onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
           try {
             // Ensure that the camera is initialized.
             await _initializeControllerFuture;
@@ -91,6 +87,10 @@ class CameraScreenState extends State<CameraScreen> {
             // Attempt to take a picture and get the file `image`
             // where it was saved.
             final image = await _controller.takePicture();
+            final imageBytes = await image.readAsBytes();
+            String img64 = base64Encode(imageBytes);
+            var data = jsonDecode(fetchdata('http://127.0.0.1:5000/api', img64));
+            //output = data['output'].toString();
 
             if (!mounted) return;
 
@@ -100,7 +100,7 @@ class CameraScreenState extends State<CameraScreen> {
                 builder: (context) => DisplayPictureScreen(
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
-                  imagePath: image.path,
+                  imageStr: data,
                 ),
               ),
             );
@@ -117,9 +117,8 @@ class CameraScreenState extends State<CameraScreen> {
 
 // A widget that displays the picture taken by the user.
 class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({super.key, required this.imagePath});
+  final String imageStr;
+  const DisplayPictureScreen({super.key, required this.imageStr});
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +126,7 @@ class DisplayPictureScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Display the Picture')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+      body: Image.memory(base64Decode(imageStr)),
     );
   }
 }
