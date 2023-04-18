@@ -2,6 +2,8 @@ import 'package:camera/camera.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
+import 'dart:convert';
+
 final uri = Uri.parse("http://127.0.0.1:5000/convert");
 
 fetchdata(XFile image) async {
@@ -13,4 +15,11 @@ fetchdata(XFile image) async {
 
   final responseBytes = response.stream.toBytes();
   return responseBytes;
+}
+
+getEmotion() async {
+  final uri2 = Uri.parse("http://127.0.0.1:5000/emotion");
+  final response = await http.get(uri2);
+  print(json.decode(response.body).toString());
+  return json.decode(response.body).toString();
 }

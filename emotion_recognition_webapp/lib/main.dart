@@ -69,24 +69,44 @@ class CameraScreenState extends State<CameraScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // If the Future is complete, display the preview.
-            return Center(child: CameraPreview(_controller));
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: double.infinity,
+              ),
+              decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
+                    left: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
+                    right: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
+                    bottom: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              margin: const EdgeInsets.all(10.0),
+              //color: Colors.grey,
+              width: 338,
+              height: 400,
+              child: CameraPreview(_controller),
+            );
           } else {
             // Otherwise, display a loading indicator.
             return const Center(child: CircularProgressIndicator());
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         // Provide an onPressed callback.
         onPressed: () async {
           try {
+            var emotionState = context.read<Emotion>();
             // Ensure that the camera is initialized.
             await _initializeControllerFuture;
-
             // Attempt to take a picture and get the file `image`
             // where it was saved.
             final image = await _controller.takePicture();
             var data = await fetchdata(image);
+            var emotion = await getEmotion();
+            emotionState.setEmotion(emotion);
+            emotionState.getEmotion();
 
             if (!mounted) return;
 
@@ -105,8 +125,10 @@ class CameraScreenState extends State<CameraScreen> {
             print(e);
           }
         },
-        child: const Icon(Icons.camera_alt),
+        label: Text('DETECT', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20)),
+        icon: const Icon(Icons.camera_alt),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
@@ -120,8 +142,6 @@ class DisplayPictureScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Detected Emotion')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
       body: Image.memory(image),
     );
   }
@@ -182,16 +202,14 @@ class Quotes extends ChangeNotifier {
 }
 
 class Emotion extends ChangeNotifier {
-  final emotions = [
-    'HAPPY',
-    'SAD',
-    'ANGRY',
-  ];
+  String emotion = "DETECTING...";
 
-  late var randomEmotion = (emotions..shuffle()).first;
+  void setEmotion(String newEmotion) {
+    newEmotion = newEmotion.substring(1, newEmotion.length - 1);
+    emotion = newEmotion.toUpperCase();
+  }
 
   void getEmotion() {
-    randomEmotion = (emotions..shuffle()).first;
     notifyListeners();
   }
 }
@@ -206,7 +224,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var emotionState = context.watch<Emotion>();
-    var emotionStr = emotionState.randomEmotion;
+    var emotionStr = emotionState.emotion;
     var quoteState = context.watch<Quotes>();
     var quoteStr = quoteState.randomQuote;
 
@@ -219,33 +237,33 @@ class MyHomePage extends StatelessWidget {
             TitleCard(emotion: emotionStr),
             Camera(camera: camera),
             SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.photo_camera),
-                    label: Text(
-                      'Capture',
-                      style: TextStyle(fontSize: 20),
-                    )),
-                SizedBox(
-                  width: 10,
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    emotionState.getEmotion();
-                    quoteState.getQuote();
-                  },
-                  icon: Icon(Icons.add_reaction),
-                  label: Text(
-                    'Detect',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   mainAxisSize: MainAxisSize.min,
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     ElevatedButton.icon(
+            //         onPressed: () {},
+            //         icon: Icon(Icons.photo_camera),
+            //         label: Text(
+            //           'Capture',
+            //           style: TextStyle(fontSize: 20),
+            //         )),
+            //     SizedBox(
+            //       width: 10,
+            //     ),
+            //     ElevatedButton.icon(
+            //       onPressed: () {
+            //         emotionState.getEmotion();
+            //         quoteState.getQuote();
+            //       },
+            //       icon: Icon(Icons.add_reaction),
+            //       label: Text(
+            //         'Detect',
+            //         style: TextStyle(fontSize: 20),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             SizedBox(height: 20),
             QuoteCard(quote: quoteStr)
           ],
@@ -268,17 +286,9 @@ class Camera extends StatelessWidget {
         constraints: BoxConstraints(
           maxHeight: double.infinity,
         ),
-        decoration: const BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
-              left: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
-              right: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
-              bottom: BorderSide(width: 7, color: Color.fromARGB(255, 144, 224, 239)),
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(10))),
-        margin: const EdgeInsets.all(10.0),
+        margin: const EdgeInsets.all(20.0),
         //color: Colors.grey,
-        width: 338,
+        width: 365,
         height: 400,
         child: CameraScreen(camera: camera),
       ),
