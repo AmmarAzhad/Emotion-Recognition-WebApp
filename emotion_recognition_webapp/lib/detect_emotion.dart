@@ -1,15 +1,16 @@
+import 'package:camera/camera.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-fetchdata(String url, String image) async {
-  http.MultipartRequest request = http.MultipartRequest('GET', Uri.parse(url));
+final uri = Uri.parse("http://127.0.0.1:5000/convert");
 
-  request.files.add(
-    http.MultipartFile.fromString(
-      'images',
-      image,
-      contentType: MediaType('text/plain', 'charset=utf-8'),
-    ),
-  );
-  return '1';
+fetchdata(XFile image) async {
+  final imageBytes = await image.readAsBytes();
+  var request = http.MultipartRequest("POST", uri);
+  request.files.add(http.MultipartFile.fromBytes("image", imageBytes, filename: "image.jpg", contentType: MediaType("image", "jpg")));
+
+  var response = await request.send();
+
+  final responseBytes = response.stream.toBytes();
+  return responseBytes;
 }
