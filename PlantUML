@@ -1,0 +1,96 @@
+@startuml
+set namespaceSeparator ::
+
+left to right direction
+
+class "emotion_recognition_webapp::main.dart::Main" {
+  +Future<void> main()
+}
+
+class "emotion_recognition_webapp::main.dart::CameraScreen" {
+  +CameraDescription camera
+  +CameraScreenState createState()
+}
+
+"emotion_recognition_webapp::main.dart::CameraScreen" o-- "camera_platform_interface::src::types::camera_description.dart::CameraDescription"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "emotion_recognition_webapp::main.dart::CameraScreen"
+
+class "emotion_recognition_webapp::main.dart::CameraScreenState" {
+  -CameraController _controller
+  -Future<void> _initializeControllerFuture
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"emotion_recognition_webapp::main.dart::CameraScreenState" o-- "camera::src::camera_controller.dart::CameraController"
+"flutter::src::widgets::framework.dart::State" <|-- "emotion_recognition_webapp::main.dart::CameraScreenState"
+
+class "emotion_recognition_webapp::main.dart::DisplayPictureScreen" {
+  +Uint8List image
+  +Widget build()
+}
+
+"emotion_recognition_webapp::main.dart::DisplayPictureScreen" o-- "dart::typed_data::Uint8List"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "emotion_recognition_webapp::main.dart::DisplayPictureScreen"
+
+class "emotion_recognition_webapp::main.dart::MyApp" {
+  +CameraDescription camera
+  +Widget build()
+}
+
+"emotion_recognition_webapp::main.dart::MyApp" o-- "camera_platform_interface::src::types::camera_description.dart::CameraDescription"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "emotion_recognition_webapp::main.dart::MyApp"
+
+class "emotion_recognition_webapp::main.dart::MyAppState" {
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "emotion_recognition_webapp::main.dart::MyAppState"
+
+class "emotion_recognition_webapp::main.dart::Quotes" {
+  +List<String> quotes
+  +String randomQuote
+  +void getQuote()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "emotion_recognition_webapp::main.dart::Quotes"
+
+class "emotion_recognition_webapp::main.dart::Emotion" {
+  +String emotion
+  +void setEmotion()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "emotion_recognition_webapp::main.dart::Emotion"
+
+class "emotion_recognition_webapp::main.dart::MyHomePage" {
+  +CameraDescription camera
+  +Widget build()
+}
+
+"emotion_recognition_webapp::main.dart::MyHomePage" o-- "camera_platform_interface::src::types::camera_description.dart::CameraDescription"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "emotion_recognition_webapp::main.dart::MyHomePage"
+
+class "emotion_recognition_webapp::main.dart::Camera" {
+  +CameraDescription camera
+  +Widget build()
+}
+
+"emotion_recognition_webapp::main.dart::Camera" o-- "camera_platform_interface::src::types::camera_description.dart::CameraDescription"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "emotion_recognition_webapp::main.dart::Camera"
+
+class "emotion_recognition_webapp::main.dart::TitleCard" {
+  +String emotion
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "emotion_recognition_webapp::main.dart::TitleCard"
+
+class "emotion_recognition_webapp::main.dart::QuoteCard" {
+  +String quote
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "emotion_recognition_webapp::main.dart::QuoteCard"
+
+
+@enduml

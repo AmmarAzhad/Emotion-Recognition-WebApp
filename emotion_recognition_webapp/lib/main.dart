@@ -7,14 +7,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
 import 'package:camera_web/camera_web.dart';
 import 'package:flutter/services.dart';
+import 'package:dcdg/dcdg.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final cameras = await availableCameras();
-  final firstCamera = cameras[0];
-  runApp(MyApp(
-    camera: firstCamera,
-  ));
+class Main {
+  Future<void> main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    final cameras = await availableCameras();
+    final firstCamera = cameras[0];
+    runApp(MyApp(
+      camera: firstCamera,
+    ));
+  }
 }
 
 // A screen that allows users to take a picture using a given camera.
@@ -103,10 +106,9 @@ class CameraScreenState extends State<CameraScreen> {
             // Attempt to take a picture and get the file `image`
             // where it was saved.
             final image = await _controller.takePicture();
-            var data = await fetchdata(image);
+            var data = await detectEmotion(image);
             var emotion = await getEmotion();
             emotionState.setEmotion(emotion);
-            emotionState.getEmotion();
 
             if (!mounted) return;
 
@@ -176,14 +178,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
-  }
-}
+class MyAppState extends ChangeNotifier {}
 
 class Quotes extends ChangeNotifier {
   final quotes = [
@@ -207,9 +202,6 @@ class Emotion extends ChangeNotifier {
   void setEmotion(String newEmotion) {
     newEmotion = newEmotion.substring(1, newEmotion.length - 1);
     emotion = newEmotion.toUpperCase();
-  }
-
-  void getEmotion() {
     notifyListeners();
   }
 }
@@ -237,34 +229,6 @@ class MyHomePage extends StatelessWidget {
             TitleCard(emotion: emotionStr),
             Camera(camera: camera),
             SizedBox(height: 10),
-            // Row(
-            //   mainAxisSize: MainAxisSize.min,
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: [
-            //     ElevatedButton.icon(
-            //         onPressed: () {},
-            //         icon: Icon(Icons.photo_camera),
-            //         label: Text(
-            //           'Capture',
-            //           style: TextStyle(fontSize: 20),
-            //         )),
-            //     SizedBox(
-            //       width: 10,
-            //     ),
-            //     ElevatedButton.icon(
-            //       onPressed: () {
-            //         emotionState.getEmotion();
-            //         quoteState.getQuote();
-            //       },
-            //       icon: Icon(Icons.add_reaction),
-            //       label: Text(
-            //         'Detect',
-            //         style: TextStyle(fontSize: 20),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            SizedBox(height: 20),
             QuoteCard(quote: quoteStr)
           ],
         ),

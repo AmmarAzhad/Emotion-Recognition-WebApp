@@ -23,6 +23,7 @@ dependencies:
   cross_file_image: ^1.0.0
   http_parser: ^4.0.2
   http:
+  dcdg:
 
 dev_dependencies:
   flutter_test:
