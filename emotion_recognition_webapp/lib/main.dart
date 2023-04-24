@@ -1,23 +1,19 @@
 import 'dart:async';
 import 'package:emotion_recognition_webapp/detect_emotion.dart';
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:camera/camera.dart';
 import 'package:camera_web/camera_web.dart';
 import 'package:flutter/services.dart';
-import 'package:dcdg/dcdg.dart';
 
-class Main {
-  Future<void> main() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    final cameras = await availableCameras();
-    final firstCamera = cameras[0];
-    runApp(MyApp(
-      camera: firstCamera,
-    ));
-  }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final cameras = await availableCameras();
+  final firstCamera = cameras[0];
+  runApp(MyApp(
+    camera: firstCamera,
+  ));
 }
 
 // A screen that allows users to take a picture using a given camera.
