@@ -1,5 +1,7 @@
 # Flutter Web App
 
+This project is Flutter Camera Web App that uses the Flutter Camera package to use the user's camera on the web.
+
 ## INSTRUCTIONS
 
 ### IMPORTANT: ENSURE THAT A CAMERA IS AVAILABLE ON THE DEVICE THAT IS BEING USED FOR TESTING
